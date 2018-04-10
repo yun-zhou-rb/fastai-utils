@@ -1,0 +1,29 @@
+#!/bin/bash
+
+
+echo "Setting up the machine"
+echo "Current directoy is $PWD"
+
+sudo apt-get install -y htop
+
+git clone https://github.com/noklam/learning_fastai.git
+bash learning_fastai/paperspace
+
+source activate fastai
+pip install -U jupyterlab
+python -m ipykernel install --user  --display-name "Python 3"
+
+# Check if CUDA is installed properly:
+sudo modprobe nvidia
+nvidia-smi
+
+echo "Connect to the notebook at $(cat cronrun.log | grep token=  | tail -n 1 | sed -e 's/8888/8082/g')" >> ~/.bashrc
+
+touch ~/cronrun.log
+
+#write out current crontab
+#echo new cron into cron file
+echo "@reboot cd ~/fastai; source ~/.bashrc; ~/anaconda3/envs/fastai/bin/jupyter notebook >> ~/cronrun.log 2>&1" >> cron_file
+#install new cron file
+crontab cron_file
+rm cron_file
