@@ -2,8 +2,13 @@
 http://course.fast.ai/
 
 ## Setup a machine on GCP
-From the `fast.ai` directory:
 ```bash
+# First set the project in which you want to work
+export GC_PROJECT = <my-project-id>
+# Set the Zone in which the machine will be created
+# See https://cloud.google.com/compute/docs/gpus/
+export GC_ZONE = us-west1-b
+# Create and setup the machine
 make create
 ```
 
