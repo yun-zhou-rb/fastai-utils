@@ -11,10 +11,10 @@ MACHINE_TYPE ?= n1-standard-1
 # n1-highmem-4 for 4 CPUs 26 Gb
 
 ifneq ($(origin GC_PROJECT), undefined)
-  GC_PROJECT_ARG = "--project $(GC_PROJECT)"
+  GC_PROJECT_ARG = --project $(GC_PROJECT)
 endif
 ifneq ($(origin GC_ZONE), undefined)
-  GC_ZONE_ARG = "--zone $(GC_ZONE)"
+  GC_ZONE_ARG = --zone $(GC_ZONE)
 endif
 
 GC_ARGS = $(GC_PROJECT_ARG) $(GC_ZONE_ARG)

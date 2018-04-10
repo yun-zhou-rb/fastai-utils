@@ -17,9 +17,9 @@ python -m ipykernel install --user  --display-name "Python 3"
 sudo modprobe nvidia
 nvidia-smi
 
-echo "Connect to the notebook at $(cat cronrun.log | grep token=  | tail -n 1 | sed -e 's/8888/8082/g')" >> ~/.bashrc
-
 touch ~/cronrun.log
+
+echo "Connect to the notebook at $(cat cronrun.log | grep token=  | tail -n 1 | sed -e 's/8888/8082/g')" >> ~/.bashrc
 
 #write out current crontab
 #echo new cron into cron file
