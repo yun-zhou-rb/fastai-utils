@@ -19,7 +19,8 @@ nvidia-smi
 
 touch ~/cronrun.log
 
-echo "Connect to the notebook at $(cat cronrun.log | grep token=  | tail -n 1 | sed -e 's/8888/8082/g')" >> ~/.bashrc
+echo 'echo "Notebook token:"' >> ~/.bashrc
+echo 'cat ~/cronrun.log | grep token=  | tail -n 1 "' >> ~/.bashrc
 
 #write out current crontab
 #echo new cron into cron file
