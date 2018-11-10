@@ -1,61 +1,59 @@
 #!/bin/bash
 
-
 echo "Setting up the machine"
 echo "Current directoy is $PWD"
 
-sudo apt-get install -y htop
-
-
-
 # sudo rm /etc/apt/apt.conf.d/*.*
+
+#sudo apt -y upgrade --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+#sudo apt -y autoremove
+#sudo ufw allow 8888:8898/tcp
+#sudo apt -y install --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" qtdeclarative5-dev qml-module-qtquick-controls
 sudo apt update
-sudo apt install unzip -y
-sudo apt -y upgrade --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
-sudo apt -y autoremove
-sudo ufw allow 8888:8898/tcp
-sudo apt -y install --force-yes -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" qtdeclarative5-dev qml-module-qtquick-controls
-sudo add-apt-repository ppa:graphics-drivers/ppa -y
-sudo apt update
+sudo apt install -y unzip htop nvidia-384 nvidia-modprobe
+
+#########
 mkdir ~/downloads
 cd ~/downloads/
-wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
-sudo dpkg -i cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
-sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
-sudo apt update
-sudo apt install cuda-9-0 -y
+wget https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run
+chmod +x cuda_9.0.176_384.81_linux-run
+./cuda_9.0.176_384.81_linux-run --extract=$HOME/downloads
+sudo ./cuda-linux.9.0.176-22781540.run -noprompt
+# Check if CUDA is installed properly:
+sudo modprobe nvidia
+nvidia-smi
 wget http://files.fast.ai/files/cudnn-9.1-linux-x64-v7.tgz
 tar xf cudnn-9.1-linux-x64-v7.tgz
 sudo cp cuda/include/*.* /usr/local/cuda/include/
 sudo cp cuda/lib64/*.* /usr/local/cuda/lib64/
+sudo bash -c "echo /usr/local/cuda/lib64/ > /etc/ld.so.conf.d/cuda.conf"
+sudo ldconfig
 wget https://repo.continuum.io/archive/Anaconda3-5.0.1-Linux-x86_64.sh
 bash Anaconda3-5.0.1-Linux-x86_64.sh -b
 cd
 git clone https://github.com/fastai/fastai.git
-cd fastai/
-echo 'export PATH=~/anaconda3/bin:$PATH' >> ~/.bashrc
-export PATH=~/anaconda3/bin:$PATH
-source ~/.bashrc
-conda env update
+cd ~/fastai/
+
+echo 'export CUDA_HOME=/usr/local/cuda' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=${CUDA_HOME}/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+echo 'export PATH=~/anaconda3/bin:${CUDA_HOME}/bin:${PATH}' >> ~/.bashrc
 echo 'source activate fastai' >> ~/.bashrc
-source activate fastai
 source ~/.bashrc
+~/anaconda3/bin/conda env update
+source ~/anaconda3/bin/activate fastai
 
-pip install -U jupyterlab
-python -m ipykernel install --user  --display-name "Python 3"
-
-# Check if CUDA is installed properly:
-sudo modprobe nvidia
-nvidia-smi
+pip install -U jupyterlab tensorflow-gpu keras
 
 touch ~/cronrun.log
 
 echo 'echo "Notebook token:"' >> ~/.bashrc
-echo 'cat ~/cronrun.log | grep token=  | tail -n 1 "' >> ~/.bashrc
+echo 'cat ~/cronrun.log | grep token  | tail -n 1 ' >> ~/.bashrc
 
 #write out current crontab
 #echo new cron into cron file
-echo "@reboot cd ~/fastai; source ~/.bashrc; ~/anaconda3/envs/fastai/bin/jupyter notebook >> ~/cronrun.log 2>&1" >> cron_file
+echo "@reboot cd ~/; ~/anaconda3/envs/fastai/bin/jupyter notebook >> ~/cronrun.log 2>&1; source ~/.bashrc" >> cron_file
 #install new cron file
 crontab cron_file
 rm cron_file
+
+

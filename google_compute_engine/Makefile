@@ -46,11 +46,14 @@ create:
 		gcp_setup_script $(INSTANCE_NAME):~
 
 	gcloud compute ssh $(INSTANCE_NAME) $(GC_ARGS) \
-		--command "source ~/gcp_setup_script"
-
-	@echo "Rebooting the machine"
+		--command "chmod +x ~/gcp_setup_script; ~/gcp_setup_script"
+	@echo "==========================="	
+	@echo "|  Rebooting the machine  |"
+	@echo "==========================="
 	gcloud compute instances reset $(INSTANCE_NAME) $(GC_ARGS)
-
+	sleep 60
+	@echo "<========= Connecting to the machine =========>"
+	make connect
 connect:
 	gcloud compute ssh $(INSTANCE_NAME) $(GC_ARGS) \
     -- -L 8082:localhost:8888
